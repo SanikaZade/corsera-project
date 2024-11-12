@@ -1,0 +1,390 @@
+#!/usr/bin/env python
+
+"""
+Example to showcase how to use the Watson NLU service
+to store you API key
+~$ mkdir ~/.ibm
+~$ touch ~/.ibm/ibmauth.py
+then edit the file to contain
+ibmauth_key = "your api key"
+"""
+
+
+
+import sys
+import os
+import json
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_watson.natural_language_understanding_v1 import Features, EntitiesOptions, KeywordsOptions
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+
+### import API key
+apikey_dir = os.path.join(os.path.expanduser("~"),".ibm")
+sys.path.append(apikey_dir)
+
+if not os.path.exists(apikey_dir):
+    raise Exception("please store you API key in file within 'apikey_dir' before proceeding")
+
+from ibmauth import NLU_KEY, NLU_URL, NLU_VERSION
+
+
+def connect_watson_nlu():
+    """
+    establish a connection to watson nlu service
+    """
+
+    authenticator = IAMAuthenticator(NLU_KEY)
+    service = NaturalLanguageUnderstandingV1(version=NLU_VERSION,
+                                             authenticator=authenticator)
+
+    service.set_service_url(NLU_URL)
+
+    print("\nConnection established.\n")
+    return(service)
+
+
+
+if __name__ == "__main__":
+
+
+    service = connect_watson_nlu()
+
+    text = 'NYC is a great city, but the winters are cold.  JFK and Newark are close by so it is easy to get away'
+    response = service.analyze(text=text,
+                               features=Features(entities=EntitiesOptions(),
+                                                 keywords=KeywordsOptions())).get_result()
+
+
+
+    print(json.dumps(response, indent=2))
+
+ 693 changes: 693 additions & 0 deletions693  
+AI_Workflow_NLP_Visual_Recogni/week1/watson-nlu/watson-nlu-tutorial.ipynb
+Large diffs are not rendered by default.
+
+ 25 changes: 25 additions & 0 deletions25  
+AI_Workflow_NLP_Visual_Recogni/week2/aavail_churn_dt
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,25 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label=<united_states &le; 0.5<br/>gini = 0.411<br/>samples = 800<br/>value = [569, 231]<br/>class = subscriber>, fillcolor="#f0b489"] ;
+1 [label=<aavail_basic &le; 0.5<br/>gini = 0.48<br/>samples = 235<br/>value = [94, 141]<br/>class = churned>, fillcolor="#bddef6"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label=<gini = 0.377<br/>samples = 135<br/>value = [34, 101]<br/>class = churned>, fillcolor="#7cbeee"] ;
+1 -> 2 ;
+3 [label=<gini = 0.48<br/>samples = 100<br/>value = [60, 40]<br/>class = subscriber>, fillcolor="#f6d5bd"] ;
+1 -> 3 ;
+4 [label=<num_streams &le; 0.368<br/>gini = 0.268<br/>samples = 565<br/>value = [475, 90]<br/>class = subscriber>, fillcolor="#ea995f"] ;
+0 -> 4 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+5 [label=<age &le; -0.221<br/>gini = 0.206<br/>samples = 275<br/>value = [243, 32]<br/>class = subscriber>, fillcolor="#e89253"] ;
+4 -> 5 ;
+6 [label=<gini = 0.229<br/>samples = 106<br/>value = [92, 14]<br/>class = subscriber>, fillcolor="#e99457"] ;
+5 -> 6 ;
+7 [label=<gini = 0.19<br/>samples = 169<br/>value = [151, 18]<br/>class = subscriber>, fillcolor="#e89051"] ;
+5 -> 7 ;
+8 [label=<aavail_premium &le; 0.5<br/>gini = 0.32<br/>samples = 290<br/>value = [232, 58]<br/>class = subscriber>, fillcolor="#eca06a"] ;
+4 -> 8 ;
+9 [label=<gini = 0.294<br/>samples = 179<br/>value = [147, 32]<br/>class = subscriber>, fillcolor="#eb9c64"] ;
+8 -> 9 ;
+10 [label=<gini = 0.359<br/>samples = 111<br/>value = [85, 26]<br/>class = subscriber>, fillcolor="#eda876"] ;
+8 -> 10 ;
+}
+ Binary file addedBIN +38.2 KB 
+AI_Workflow_NLP_Visual_Recogni/week2/decision-tree-example.zip
+Binary file not shown.
+ 118 changes: 118 additions & 0 deletions118  
+AI_Workflow_NLP_Visual_Recogni/week2/npl/AI_Workflow_Bagging_and_Random_Forests.ipynb
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,118 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "AI_Workflow_Bagging_and_Random_Forests.ipynb",
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZR4Mtpb3NTrm",
+        "outputId": "d08b6c95-5a52-4570-d6ad-d0c1d1e1590d"
+      },
+      "source": [
+        "import numpy as np\r\n",
+        "x = np.random.normal(loc=50.0, scale=10.0, size=100)\r\n",
+        "nsamples = 500\r\n",
+        "bs_samples = np.random.choice(x, (nsamples, x.size), replace=True)\r\n",
+        "bs_distn = np.mean(bs_samples, axis=1)\r\n",
+        "print(\"Bootstrap CI: (%.4f, %.4f)\"%(bs_distn[int(0.025*nsamples)], bs_distn[int(0.975*nsamples)]))"
+      ],
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Bootstrap CI: (51.1939, 50.3934)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "29VvLvLfN6CR"
+      },
+      "source": [
+        "#!/usr/bin/env python\r\n",
+        "\r\n",
+        "\"\"\"\r\n",
+        "simple bagging example\r\n",
+        "\"\"\"\r\n",
+        "\r\n",
+        "import numpy as np\r\n",
+        "from sklearn.ensemble import BaggingClassifier\r\n",
+        "from sklearn.neighbors import KNeighborsClassifier\r\n",
+        "from sklearn.datasets import load_iris\r\n",
+        "from sklearn.preprocessing import StandardScaler\r\n",
+        "from sklearn.metrics import classification_report, f1_score\r\n",
+        "from sklearn.model_selection import train_test_split\r\n",
+        "from sklearn.tree import DecisionTreeClassifier\r\n",
+        "from sklearn.pipeline import Pipeline\r\n",
+        "from sklearn.svm import SVC\r\n",
+        "\r\n",
+        "np.random.seed(0)\r\n",
+        "iris = load_iris()\r\n",
+        "X, y = iris.data, iris.target\r\n",
+        "indices = np.arange(y.shape[0])\r\n",
+        "np.random.shuffle(indices)\r\n",
+        "\r\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)\r\n",
+        "\r\n",
+        "\r\n",
+        "\r\n",
+        "   "
+      ],
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "yJBDbxnsO2Nm",
+        "outputId": "19460100-59dd-410a-f7de-168db9c8c382"
+      },
+      "source": [
+        "bm_name = ['KNN','DT ','SVM']\r\n",
+        "for bm, basemodel in enumerate([KNeighborsClassifier(), DecisionTreeClassifier(), SVC(kernel='rbf')]):\r\n",
+        "    \r\n",
+        "    clf = BaggingClassifier(basemodel, n_estimators=30,max_samples=0.5, max_features=0.5)\r\n",
+        "    \r\n",
+        "    pipe  = Pipeline(steps=[('scaler', StandardScaler()),('bagged_clf', clf)])\r\n",
+        "\r\n",
+        "    pipe.fit(X_train, y_train)\r\n",
+        "    \r\n",
+        "    y_pred = pipe.predict(X_test)\r\n",
+        "    \r\n",
+        "    print(bm_name[bm], \"f1_score\", round(f1_score(y_test, y_pred,average='weighted'), 3))"
+      ],
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "KNN f1_score 0.967\n",
+            "DT  f1_score 0.933\n",
+            "SVM f1_score 0.967\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    }
+  ]
+}
+ Binary file addedBIN +6 KB 
+AI_Workflow_NLP_Visual_Recogni/week2/npl/decision-tree-example/.DS_Store
+Binary file not shown.
+ Binary file addedBIN +6 KB 
+AI_Workflow_NLP_Visual_Recogni/week2/npl/decision-tree-example/data/.DS_Store
+Binary file not shown.
+ 1,001 changes: 1,001 additions & 0 deletions1,001  
+AI_Workflow_NLP_Visual_Recogni/week2/npl/decision-tree-example/data/aavail-target.csv
+Large diffs are not rendered by default.
+
+ Binary file addedBIN +6 KB 
+AI_Workflow_NLP_Visual_Recogni/week2/npl/decision-tree-example/script/.DS_Store
+Binary file not shown.
+ 25 changes: 25 additions & 0 deletions25  
+AI_Workflow_NLP_Visual_Recogni/week2/npl/decision-tree-example/script/aavail_churn_dt
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,25 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label=<singapore &le; 0.5<br/>gini = 0.411<br/>samples = 800<br/>value = [569, 231]<br/>class = subscriber>, fillcolor="#f0b489"] ;
+1 [label=<num_streams &le; 0.368<br/>gini = 0.268<br/>samples = 565<br/>value = [475, 90]<br/>class = subscriber>, fillcolor="#ea995f"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label=<age &le; -0.221<br/>gini = 0.206<br/>samples = 275<br/>value = [243, 32]<br/>class = subscriber>, fillcolor="#e89253"] ;
+1 -> 2 ;
+3 [label=<gini = 0.229<br/>samples = 106<br/>value = [92, 14]<br/>class = subscriber>, fillcolor="#e99457"] ;
+2 -> 3 ;
+4 [label=<gini = 0.19<br/>samples = 169<br/>value = [151, 18]<br/>class = subscriber>, fillcolor="#e89051"] ;
+2 -> 4 ;
+5 [label=<aavail_premium &le; 0.5<br/>gini = 0.32<br/>samples = 290<br/>value = [232, 58]<br/>class = subscriber>, fillcolor="#eca06a"] ;
+1 -> 5 ;
+6 [label=<gini = 0.294<br/>samples = 179<br/>value = [147, 32]<br/>class = subscriber>, fillcolor="#eb9c64"] ;
+5 -> 6 ;
+7 [label=<gini = 0.359<br/>samples = 111<br/>value = [85, 26]<br/>class = subscriber>, fillcolor="#eda876"] ;
+5 -> 7 ;
+8 [label=<aavail_basic &le; 0.5<br/>gini = 0.48<br/>samples = 235<br/>value = [94, 141]<br/>class = churned>, fillcolor="#bddef6"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label=<gini = 0.377<br/>samples = 135<br/>value = [34, 101]<br/>class = churned>, fillcolor="#7cbeee"] ;
+8 -> 9 ;
+10 [label=<gini = 0.48<br/>samples = 100<br/>value = [60, 40]<br/>class = subscriber>, fillcolor="#f6d5bd"] ;
+8 -> 10 ;
+}
+ Binary file addedBIN +18.8 KB 
+AI_Workflow_NLP_Visual_Recogni/week2/npl/decision-tree-example/script/aavail_churn_dt.pdf
+Binary file not shown.
+ 91 changes: 91 additions & 0 deletions91  
+...rkflow_NLP_Visual_Recogni/week2/npl/decision-tree-example/script/decision-tree-example.py
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,91 @@
+#!/usr/bin/env python
+"""
+"""
+
+import sys
+import os
+import re
+import numpy as np
+import pandas as pd
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, export_graphviz, plot_tree
+from sklearn.pipeline import Pipeline
+
+def load_data():
+
+    data_dir = os.path.join("..","data")
+    df = pd.read_csv(os.path.join(data_dir,r"aavail-target.csv"))
+
+    ## pull out the target and remove uneeded columns
+    _y = df.pop('is_subscriber')
+    y = np.zeros(_y.size)
+    y[_y==0] = 1 
+    df.drop(columns=['customer_id','customer_name'],inplace=True)
+    return(y,df)
+
+
+## variables
+rs = 42
+
+## preprocessing pipeline
+numeric_features = ['age', 'num_streams']
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())])
+
+categorical_features = ['country', 'subscriber_type']
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)])
+
+if __name__ == "__main__":
+
+    ## load the data
+    y,df = load_data()
+    X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=0.2, stratify=y, random_state=rs)
+
+    pipe  = Pipeline(steps=[('preprocessor', preprocessor),
+                            ('dt', DecisionTreeClassifier(min_samples_leaf=100))])
+
+    pipe.fit(X_train, y_train)
+    y_pred = pipe.predict(X_test)
+
+
+    ## extract feature names 
+    feature_names = np.hstack([numeric_features,
+                               preprocessor.transformers_[1][1].named_steps['onehot'].get_feature_names()])
+    feature_names = [re.sub("x\d_","",fn) for fn in feature_names]
+    target_names = ['subscriber','churned']
+    print(feature_names)
+    print(classification_report(y_test, y_pred, target_names=target_names))
+
+
+    ## make plot
+    try:
+        import graphviz        
+    except:
+        print("not creating tree since graphviz is not installed")
+        sys.exit()
+
+    dot_data = export_graphviz(pipe['dt'], out_file=None, 
+                                    feature_names=feature_names,  
+                                    class_names=target_names,  
+                                    filled=True, rounded=True, 
+                                    special_characters=True)
+
+    graph = graphviz.Source(dot_data)  
+    graph.render("aavail_churn_dt")
+    print("Graph saved in your working directory.")
+
+
+
+ 189 changes: 189 additions & 0 deletions189  
+AI_Workflow_NLP_Visual_Recogni/week2/npl/decison_tree.ipynb
+Large diffs are not rendered by default.
+
+ Binary file addedBIN +16.8 MB 
+AI_Workflow_NLP_Visual_Recogni/week2/visual.zip
+Binary file not shown.
+ 887 changes: 887 additions & 0 deletions887  
+AI_Workflow_NLP_Visual_Recogni/week2/visual/1.TensorFlow-case-study-solution.ipynb
+Large diffs are not rendered by default.
+
+ 601 changes: 601 additions & 0 deletions601  
+AI_Workflow_NLP_Visual_Recogni/week2/visual/PCA/2.TensorFlow-case-study-pca_rf_gb.ipynb
+Large diffs are not rendered by default.
+
+ 2,001 changes: 2,001 additions & 0 deletions2,001  
+...eek2/visual/PCA/3_TensorFlow_case_study_pca(visulalization)_random_forest_Ada_boost.ipynb
+Large diffs are not rendered by default.
+
+ 2,270 changes: 2,270 additions & 0 deletions2,270  
+...low_NLP_Visual_Recogni/week2/visual/PCA/4_TensorFlow_case_study_pca(visulalization).ipynb
+Large diffs are not rendered by default.
+
+ 2,345 changes: 2,345 additions & 0 deletions2,345  
+...ow_NLP_Visual_Recogni/week2/visual/PCA/5_TensorFlow_cifar10_study_pca_visualization.ipynb
+Large diffs are not rendered by default.
+
+ 3,532 changes: 3,532 additions & 0 deletions3,532  
+...ow_NLP_Visual_Recogni/week2/visual/PCA/7_TensorFlow_eurosat_study_pca_visualization.ipynb
+Large diffs are not rendered by default.
+
+ 1,957 changes: 1,957 additions & 0 deletions1,957  
+...low_NLP_Visual_Recogni/week2/visual/TSNE/8_TensorFlow_tsne_visualization_of_eurosat.ipynb
